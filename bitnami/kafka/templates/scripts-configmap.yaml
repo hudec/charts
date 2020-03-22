@@ -25,7 +25,7 @@ data:
     {{- end }}
 
     # Configure Kafka internal and external listeners
-    export KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=INTERNAL:PLAINTEXT,BROKER:SSL,EXTERNAL:SSL
+    export KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=INTERNAL:PLAINTEXT,BROKER:SSL,EXTERNAL:SASL_SSL
     export KAFKA_CFG_LISTENERS=INTERNAL://:{{ .Values.service.port }},BROKER://:9093,EXTERNAL://:${EXTERNAL_ACCESS_PORT}
     export KAFKA_INTER_BROKER_LISTENER_NAME=BROKER
     {{- if .Values.advertisedListeners }}
