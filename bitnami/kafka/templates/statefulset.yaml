@@ -62,6 +62,8 @@ spec:
           {{- if .Values.externalAccess.enabled }}
           command:
             - /scripts/setup.sh
+          {{- else }}
+          command: ["/bin/bash", "-c"]
           {{- end }}
           env:
             - name: BITNAMI_DEBUG
@@ -204,7 +206,6 @@ spec:
             {{- if .Values.extraEnvVars }}
             {{ include "kafka.tplValue" ( dict "value" .Values.extraEnvVars "context" $) | nindent 12 }}
             {{- end }}
-          command: ["/bin/bash", "-c"]
           args:
             - export KAFKA_CFG_BROKER_ID=${MY_POD_NAME##*-};
               exec /entrypoint.sh /run.sh;

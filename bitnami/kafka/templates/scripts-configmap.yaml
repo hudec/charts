@@ -25,14 +25,23 @@ data:
     {{- end }}
 
     # Configure Kafka internal and external listeners
-    export KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
-    export KAFKA_CFG_LISTENERS=INTERNAL://:{{ .Values.service.port }},EXTERNAL://:${EXTERNAL_ACCESS_PORT}
-    export KAFKA_INTER_BROKER_LISTENER_NAME=INTERNAL
+    export KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=INTERNAL:PLAINTEXT,BROKER:SSL,EXTERNAL:SSL
+    export KAFKA_CFG_LISTENERS=INTERNAL://:{{ .Values.service.port }},BROKER://:9093,EXTERNAL://:${EXTERNAL_ACCESS_PORT}
+    export KAFKA_INTER_BROKER_LISTENER_NAME=BROKER
     {{- if .Values.advertisedListeners }}
     export KAFKA_CFG_ADVERTISED_LISTENERS={{ .Values.advertisedListeners }}
     {{- else }}
-    export KAFKA_CFG_ADVERTISED_LISTENERS="INTERNAL://${MY_POD_NAME}.{{ template "kafka.fullname" . }}-headless.{{.Release.Namespace}}.svc.{{ .Values.clusterDomain }}:{{ .Values.service.port }},EXTERNAL://${EXTERNAL_ACCESS_IP}:${EXTERNAL_ACCESS_PORT}"
+    export KAFKA_CFG_ADVERTISED_LISTENERS="INTERNAL://${MY_POD_NAME}.{{ template "kafka.fullname" . }}-headless.{{.Release.Namespace}}.svc.{{ .Values.clusterDomain }}:{{ .Values.service.port }},BROKER://${MY_POD_NAME}.{{ template "kafka.fullname" . }}-headless.{{.Release.Namespace}}.svc.{{ .Values.clusterDomain }}:9093,EXTERNAL://${EXTERNAL_ACCESS_IP}:${EXTERNAL_ACCESS_PORT}"
     {{- end }}
+
+    echo "HOSTNAME=$HOSTNAME"
+    echo "ID=$ID"
+    echo "EXTERNAL_ACCESS_IP=$EXTERNAL_ACCESS_IP"
+    echo "EXTERNAL_ACCESS_PORT=$EXTERNAL_ACCESS_PORT"
+    echo "KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=$KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP"
+    echo "KAFKA_CFG_LISTENERS=$KAFKA_CFG_LISTENERS"
+    echo "KAFKA_INTER_BROKER_LISTENER_NAME=$KAFKA_INTER_BROKER_LISTENER_NAME"
+    echo "KAFKA_CFG_ADVERTISED_LISTENERS=$KAFKA_CFG_ADVERTISED_LISTENERS"
 
     exec /entrypoint.sh /run.sh
 
